@@ -1,0 +1,58 @@
+---
+- name: Install and configure Nginx web server
+  hosts: web
+  become: true
+  gather_facts: true
+
+  vars:
+    site_title: "Hello from Nginx (Ansible)"
+    site_message: "Nginx is installed and serving this page."
+
+  tasks:
+    - name: Install Nginx (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+      when: ansible_facts.os_family == "Debian"
+
+    - name: Install Nginx (RHEL-family)
+      ansible.builtin.yum:
+        name: nginx
+        state: present
+      when: ansible_facts.os_family == "RedHat"
+
+    - name: Deploy index.html to the default web root
+      ansible.builtin.copy:
+        dest: /var/www/html/index.html
+        mode: "0644"
+        content: |
+          <!doctype html>
+          <html>
+            <head><meta charset="utf-8"><title>{{ site_title }}</title></head>
+            <body style="font-family: Arial, sans-serif;">
+              <h1>{{ site_title }}</h1>
+              <p>{{ site_message }}</p>
+              <hr>
+              <p><strong>Host:</strong> {{ inventory_hostname }}</p>
+            </body>
+          </html>
+
+    - name: Makes Nginx is running and enabled
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Checks/makes ufw is installed
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Allow HTTP through UFW if on
+      community.general.ufw:
+        rule: allow
+        port: "80"
+        proto: tcp
+      when:
+        - ansible_facts.os_family == "Debian"
+        - "'ufw' in ansible_facts.packages"
