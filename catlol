@@ -1,0 +1,10 @@
+cat > /var/www/mountain.com/html/index.html <<'EOF'
+<!doctype html>
+<html>
+  <head><meta charset="utf-8"><title>mountain.com</title></head>
+  <body style="font-family: Arial, sans-serif;">
+    <h1>mountain.com is live</h1>
+    <p>Nginx is serving this site correctly.</p>
+  </body>
+</html>
+EOF
