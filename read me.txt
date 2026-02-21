@@ -1,0 +1,7 @@
+Read me 
+to run Nginx
+ansible-playbook -i inventory.ini nginx.yml
+
+to run Apache 
+ansible-playbook -i inventory.ini apache.yml
+
